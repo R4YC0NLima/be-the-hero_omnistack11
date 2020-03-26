@@ -1,80 +1,62 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FiPower, FiTrash2 } from 'react-icons/fi'
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { FiPower, FiTrash2 } from "react-icons/fi";
 
-import './style.css';
-import logoImg from '../../assets/logo.svg';
+import api from "../../services/api.js";
+import "./style.css";
+import logoImg from "../../assets/logo.svg";
 
-export default function Profile(){
-    return(
-        <div className="profile-container">
-            <header>
-                <img src={logoImg} alt="Be the hero"/>
-                <span>Bem vinda, APAD</span>
+export default function Profile() {
+  const [incidents, setIncidents] = useState([]);
 
-                <Link className="button" to="/incidents/new">Cadastrar novo caso</Link>
-                <button>
-                    <FiPower size="18" color="#e02041"/>
-                </button>
-            </header>
+  const ongId = localStorage.getId("ongId");
+  const ongName = localStorage.getItem("ongName");
 
-            <h1>Casos cadastrados</h1>
-            
-            <ul>
-                <li>
-                    <strong>CASO1:</strong>
-                    <p>caso teste</p>
+  useEffect(() => {
+    api
+      .get("profile", {
+        headers: {
+          Authorization: ongId
+        }
+      })
+      .then(response => {
+        setIncidents(response.data);
+      });
+  }, [ongId]);
 
-                    <strong>DESCRIÇÃO:</strong>
-                    <p>Descrição teste 1</p>
+  return (
+    <div className="profile-container">
+      <header>
+        <img src={logoImg} alt="Be the hero" />
+        <span>Bem vinda, {ongName}</span>
 
-                    <strong>VALOR 1</strong>
-                    <p>R$120,00</p>
-                    <button type="button">
-                        <FiTrash2 size="20"  color="#a8a8b3"/>
-                    </button>
-                </li>
-                <li>
-                    <strong>CASO2:</strong>
-                    <p>caso teste 2</p>
+        <Link className="button" to="/incidents/new">
+          Cadastrar novo caso
+        </Link>
+        <button>
+          <FiPower size="18" color="#e02041" />
+        </button>
+      </header>
 
-                    <strong>DESCRIÇÃO2:</strong>
-                    <p>Descrição teste 2</p>
+      <h1>Casos cadastrados</h1>
 
-                    <strong>VALOR 2</strong>
-                    <p>R$120,00</p>
-                    <button type="button">
-                        <FiTrash2 size="20"  color="#a8a8b3"/>
-                    </button>
-                </li>
-                <li>
-                    <strong>CASO 3:</strong>
-                    <p>caso teste 3</p>
+      <ul>
+        {incidents.map(incident => (
+          <li key={incident.id}>
+            <strong>CASO1:</strong>
+            <p>{incident.title}</p>
 
-                    <strong>DESCRIÇÃO3: </strong>
-                    <p>Descrição teste 3</p>
+            <strong>DESCRIÇÃO:</strong>
+            <p>{incident.description}</p>
 
-                    <strong>VALOR 3</strong>
-                    <p>R$120,00</p>
-                    <button type="button">
-                        <FiTrash2 size="20"  color="#a8a8b3"/>
-                    </button>
-                </li>
-                <li>
-                    <strong>CASO 4:</strong>
-                    <p>caso teste 4</p>
-
-                    <strong>DESCRIÇÃO4: </strong>
-                    <p>Descrição teste 4</p>
-
-                    <strong>VALOR 4</strong>
-                    <p>R$120,00</p>
-                    <button type="button">
-                        <FiTrash2 size="20"  color="#a8a8b3"/>
-                    </button>
-                </li>
-                
-            </ul>
-        </div>
-    );
+            <strong>VALOR 1</strong>
+            <p>{incident.value}</p>
+            <button type="button">
+              <FiTrash2 size="20" color="#a8a8b3" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
